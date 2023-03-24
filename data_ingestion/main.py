@@ -3,6 +3,7 @@ import datetime
 from typing import Iterator
 import boto3
 import logging
+import requests
 
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import udf, col, lit, concat
@@ -24,6 +25,7 @@ from data_ingestion.config import (
     S3_KEY_PREFIX,
     PY_LOG_LEVEL,
     PY_SPARK_LOG_LEVEL_MAP,
+    SEARCH_RESULT_SAMPLING_FACTOR
 )
 from data_ingestion.utils import get_bucket_and_key_from_s3_url
 
@@ -73,7 +75,7 @@ def parse_nasa_image_api_search_hit(response_data: dict) -> dict:
         "nasa_id": response_data["data"][0]["nasa_id"],
         "title": response_data["data"][0]["title"],
         "date_created": date_created_dt,
-        "description": response_data["data"][0]["description"],
+        "description": response_data["data"][0].get("description", "MISSING DESCRIPTION"),
         "image_href": image_href,
         "original_image_file_name": image_href.split("/")[-1],
         "image_file_extension": "." + image_href.split(".")[-1],
@@ -83,7 +85,12 @@ def parse_nasa_image_api_search_hit(response_data: dict) -> dict:
 
 def download_bytes(url: str) -> bytes:
     api_client = BaseApiClient(url)
-    response = api_client.make_get_request("")
+    try:
+        response = api_client.make_get_request("")
+    except requests.exceptions.RetryError:
+        # HACK: Rate-limit Spark job to avoid overwhelming the images-assets.nasa.gov host.
+        logger.error(f"Skipping image download for {url} because retries failed. Are you exceeding rate limits?")
+        return b""
     return response.content
 
 
@@ -128,11 +135,11 @@ def main() -> None:
 
     # estimate number of pages to parallelize requests to the image api
     est_num_pages = nasa_api_client.estimate_number_pages_in_paginated_result(response)
-    page_ids = list(range(1, est_num_pages + 1))  # pagination is 1-indexed
+    page_ids = list(range(1, est_num_pages + 1, SEARCH_RESULT_SAMPLING_FACTOR))  # pagination is 1-indexed
     pages_rdd = sc.parallelize(page_ids)
 
     logger.warning(
-        f"Parallelizing NASA API requests over {est_num_pages} estimated response pages."
+        f"Parallelizing NASA API requests over {est_num_pages // SEARCH_RESULT_SAMPLING_FACTOR} estimated response pages."
     )
 
     # perform the requests
@@ -191,7 +198,6 @@ def main() -> None:
     records_df.write.format("parquet").mode("Overwrite").save(records_location)
 
     images_df.foreachPartition(write_rows_to_s3)
-
 
 if __name__ == "__main__":
     main()

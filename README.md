@@ -8,6 +8,13 @@ The application is containerized with Docker for the sake of portability.
 The application requires several environment variables to run.
 The environment variables can be supplied by creating a .env file at the root of this repo 
 where each line is a pair `key=value`.
+- S3_BUCKET_NAME: Name of S3 bucket to store results.
+- AWS_ACCESS_KEY_ID: AWS access key id credential.
+- AWS_SECRET_ACCESS_KEY: AWS secret access key credential.
+- NASA_API_KEY: API key for the NASA data APIs.
+- SEARCH_RESULT_SAMPLING_FACTOR: Factor downsample the results pulled from the NASA API.
+    The NASA APIs are rate-limited to 1000 requests per hour. Try increasing this
+    parameter if errors occur due to excessive request retries.
 
 Use the provided Makefile to interact with this repo:
 - `make build`: Build the Docker image.

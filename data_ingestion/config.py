@@ -1,6 +1,11 @@
 import os
 import logging
 
+SEARCH_RESULT_SAMPLING_FACTOR = os.environ.get(
+    "SEARCH_RESULT_SAMPLING_FACTOR", "1"
+)
+SEARCH_RESULT_SAMPLING_FACTOR = int(SEARCH_RESULT_SAMPLING_FACTOR)
+
 NASA_IMAGE_API_BASE_URL = os.environ.get(
     "NASA_IMAGE_API_BASE_URL", "https://images-api.nasa.gov/"
 )
