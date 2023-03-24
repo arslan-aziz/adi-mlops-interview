@@ -22,5 +22,4 @@ class NasaImageApiClient(BaseApiClient):
 
     def estimate_number_pages_in_paginated_result(self, response: requests.Response, page_size: int=DEFAULT_PAGE_SIZE) -> int:
         total_hits = response.json()['collection']['metadata']['total_hits']
-        # return total_hits // page_size
-        return 1
+        return total_hits // page_size + 1
