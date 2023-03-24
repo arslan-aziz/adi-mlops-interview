@@ -25,8 +25,6 @@ def test_make_nasa_api_search_request_and_get_json(mock_nasa_image_api_client):
     )
     assert make_nasa_api_search_request_and_get_json(1) == []
 
-
-# TODO add more edge cases
 def test_parse_nasa_image_api_search_hit():
     TEST_DATA = {
         "data": [
