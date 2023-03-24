@@ -1,15 +1,17 @@
 import os
 import logging
 
-NASA_IMAGE_API_BASE_URL = os.environ.get('NASA_IMAGE_API_BASE_URL', 'https://images-api.nasa.gov/')
-NASA_API_KEY = os.environ.get('NASA_API_KEY', '')
+NASA_IMAGE_API_BASE_URL = os.environ.get(
+    "NASA_IMAGE_API_BASE_URL", "https://images-api.nasa.gov/"
+)
+NASA_API_KEY = os.environ.get("NASA_API_KEY", "")
 if NASA_API_KEY == "":
     raise ValueError("Must set the NASA_API_KEY environment variable.")
 
-S3_BUCKET_NAME = os.environ.get('S3_BUCKET_NAME', "")
+S3_BUCKET_NAME = os.environ.get("S3_BUCKET_NAME", "")
 if S3_BUCKET_NAME == "":
     raise ValueError("Must set the S3_BUCKET_NAME environment variable.")
-S3_KEY_PREFIX = os.environ.get('S3_KEY_PREFIX', "moon_dataset")
+S3_KEY_PREFIX = os.environ.get("S3_KEY_PREFIX", "moon_dataset")
 
 AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID", "")
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY", "")
@@ -32,9 +34,9 @@ elif __PY_LOG_LEVEL.lower() == "debug":
 
 # map python log levels to Spark log levels
 PY_SPARK_LOG_LEVEL_MAP = {
-    logging.CRITICAL: 'FATAL',
-    logging.ERROR: 'ERROR',
-    logging.WARNING: 'WARN',
-    logging.INFO: 'INFO',
-    logging.DEBUG: 'DEBUG'
+    logging.CRITICAL: "FATAL",
+    logging.ERROR: "ERROR",
+    logging.WARNING: "WARN",
+    logging.INFO: "INFO",
+    logging.DEBUG: "DEBUG",
 }

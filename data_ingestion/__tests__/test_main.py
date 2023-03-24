@@ -7,17 +7,24 @@ from data_ingestion.main import (
     parse_nasa_image_api_search_hit,
 )
 
-@patch('data_ingestion.main.NasaImageApiClient')
+
+@patch("data_ingestion.main.NasaImageApiClient")
 def test_make_nasa_api_search_request_and_get_json(mock_nasa_image_api_client):
     # Test the happy path
-    TEST_DATA = {'collection': {'items': [1, 2, 3]}}
-    mock_nasa_image_api_client.return_value.make_get_request.return_value.json.return_value = TEST_DATA
-    assert make_nasa_api_search_request_and_get_json(1) == TEST_DATA['collection']['items']
+    TEST_DATA = {"collection": {"items": [1, 2, 3]}}
+    mock_nasa_image_api_client.return_value.make_get_request.return_value.json.return_value = (
+        TEST_DATA
+    )
+    assert (
+        make_nasa_api_search_request_and_get_json(1) == TEST_DATA["collection"]["items"]
+    )
 
     # Test the error path
-    mock_nasa_image_api_client.return_value.make_get_request.side_effect = ApiException()
+    mock_nasa_image_api_client.return_value.make_get_request.side_effect = (
+        ApiException()
+    )
     assert make_nasa_api_search_request_and_get_json(1) == []
-    
+
 
 # TODO add more edge cases
 def test_parse_nasa_image_api_search_hit():
@@ -37,23 +44,22 @@ def test_parse_nasa_image_api_search_hit():
             {
                 "href": "https//images-assets.nasa.gov/animage.jpg",
                 "rel": "preview",
-                "render": "image"
+                "render": "image",
             },
-            {
-                "href": "https//images-assets.nasa.gov/notanimage.txt",
-                "render": "text"
-            }
-        ]
+            {"href": "https//images-assets.nasa.gov/notanimage.txt", "render": "text"},
+        ],
     }
 
     CORRECT_RESULT = {
-        'nasa_id': "as11-40-5874", 
-        'title': "An Image from Space about the Moon",
-        'date_created': datetime.datetime(1969, 7, 21, 0, 0, tzinfo=datetime.timezone.utc),
-        'description': "a description",
-        'image_href': "https//images-assets.nasa.gov/animage.jpg",
-        'original_image_file_name': "animage.jpg",
-        'image_file_extension': ".jpg"
+        "nasa_id": "as11-40-5874",
+        "title": "An Image from Space about the Moon",
+        "date_created": datetime.datetime(
+            1969, 7, 21, 0, 0, tzinfo=datetime.timezone.utc
+        ),
+        "description": "a description",
+        "image_href": "https//images-assets.nasa.gov/animage.jpg",
+        "original_image_file_name": "animage.jpg",
+        "image_file_extension": ".jpg",
     }
 
     assert parse_nasa_image_api_search_hit(TEST_DATA) == CORRECT_RESULT

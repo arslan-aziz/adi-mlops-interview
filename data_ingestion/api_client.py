@@ -1,16 +1,19 @@
 import requests
 from urllib.parse import urljoin
 
+
 class ApiException(Exception):
     pass
 
-class BaseApiClient:
 
-    def __init__(self, base_url: str, api_key:str=None):
+class BaseApiClient:
+    def __init__(self, base_url: str, api_key: str = None):
         self.base_url = base_url
         self.api_key = api_key
-    
-    def make_get_request(self, endpoint: str, query_params: dict=None, headers: dict=None) -> requests.Response:
+
+    def make_get_request(
+        self, endpoint: str, query_params: dict = None, headers: dict = None
+    ) -> requests.Response:
         full_url = urljoin(self.base_url, endpoint)
         response = requests.get(full_url, params=query_params, headers=headers)
         self.validate_response(response)
