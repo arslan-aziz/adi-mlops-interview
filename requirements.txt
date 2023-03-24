@@ -1,0 +1,4 @@
+pyspark==3.3.2
+pytest
+requests
+boto3
