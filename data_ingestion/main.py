@@ -16,7 +16,7 @@ from pyspark.sql.types import (
 )
 
 from data_ingestion.api_client import BaseApiClient, ApiException
-from data_ingestion.nasa_image_api_client import NasaImageApiClient
+from data_ingestion.nasa_image_api_client import NasaImageApiClient, SearchResultsExhaustedException
 from data_ingestion.config import (
     NASA_API_KEY,
     NASA_IMAGE_API_BASE_URL,
@@ -52,7 +52,7 @@ def make_nasa_api_search_request_and_get_json(page_id: int) -> dict:
                 "page_size": NasaImageApiClient.DEFAULT_PAGE_SIZE,
             },
         )
-    except ApiException as e:
+    except ApiException:
         return EMPTY_RESULT
     return response.json()["collection"]["items"]
 
